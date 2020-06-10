@@ -1,0 +1,18 @@
+distinguished_name = req_distinguished_name
+
+x509_extensions = cert
+
+[ cert ]
+basicConstraints = critical,CA:TRUE
+keyUsage = critical,cRLSign,keyCertSign
+subjectKeyIdentifier=hash
+
+[ req_distinguished_name ]
+
+countryName                     = Country Name (2 letter code)
+countryName_default             = US
+countryName_min                 = 2
+countryName_max                 = 2
+
+commonName                      = Common Name (eg, YOUR name)
+commonName_max                  = 64
