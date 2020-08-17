@@ -36,7 +36,7 @@ public class CertificateGenerator {
 		try {
 			//Request a signature and generate a key, save both.
 			//			runCommand("openssl req -new -nodes -newkey rsa:2048 -keyout " + directory + "/" + siteName + ".key -out " + directory + "/" + siteName + ".csr -days 3650 -subj \"/C=US/ST=SCA/L=SCA/O=Oracle/OU=Java/CN=*." + siteName + "\"").waitFor();
-			runCommand("openssl req -new -nodes -key " + directory + "/" + "key.key -out " + directory + "/" + siteName + ".csr -days 3650 -subj \"/C=US/ST=SCA/L=SCA/O=Oracle/OU=Java/CN=*." + siteName + "\"").waitFor();
+			runCommand("openssl req -new -nodes -key '" + directory + "/" + "key.key' -out '" + directory + "/" + siteName + ".csr' -days 398 -subj \"/C=US/ST=SCA/L=SCA/O=Oracle/OU=Java/CN=*." + siteName + "\"").waitFor();
 			//Generate SAN names for the site.
 			String altNames = "DNS:" + siteName + ",DNS:www." + siteName + ",DNS:*." + siteName;// + ",DNS:www.*." + siteName + ",DNS:*.*." + siteName;
 			File tmpSANConf = new File(directory, "tmpSAN-" + siteName + ".cnf");
@@ -47,7 +47,7 @@ public class CertificateGenerator {
 			out.close();
 			//Sign the request with the given SANs and the root certificate.
 			//Use faketime because openssl makes certificates only valid in the future, while they are needed now. This was causing pages to break in iOS.
-			String signRequest = "faketime -f \"-1y\" openssl x509 -req -in " + directory + "/" + siteName + ".csr -CA " + directory + "/" + "rootCA.crt -CAkey " + directory + "/" + "rootCA.key -CAcreateserial -out " + directory + "/" + siteName + ".crt -days 2000 -sha256 -extensions SAN -extfile " + tmpSANConf + "";
+			String signRequest = "faketime -f \"-10d\" openssl x509 -req -in '" + directory + "/" + siteName + ".csr' -CA '" + directory + "/" + "rootCA.crt' -CAkey '" + directory + "/" + "rootCA.key' -CAcreateserial -out '" + directory + "/" + siteName + ".crt' -days 398 -sha256 -extensions SAN -extfile '" + tmpSANConf + "'";
 			//			System.out.println(signRequest);
 			//patch to allow use of homebrew faketime on macs, 
 			if (System.getProperty("os.name").toLowerCase().contains("mac")) {
@@ -59,7 +59,7 @@ public class CertificateGenerator {
 			new File(directory, siteName + ".csr").delete();
 			
 			//Export the key and certificate to a p12 file.
-			String command = "openssl pkcs12 -export -in " + new File(directory, siteName + ".crt") + " -inkey " + new File(directory, "key.key") + " -chain -CAfile " + directory + "/rootCA.crt -name \"*." + siteName + "\" -out " + new File(directory, siteName + ".p12") + " -passin pass:password -passout pass:password";
+			String command = "openssl pkcs12 -export -in '" + new File(directory, siteName + ".crt") + "' -inkey '" + new File(directory, "key.key") + "' -chain -CAfile '" + directory + "/rootCA.crt' -name \"*." + siteName + "\" -out '" + new File(directory, siteName + ".p12") + "' -passin pass:password -passout pass:password";
 			
 			Process p = runCommand(command);
 			p.waitFor();
